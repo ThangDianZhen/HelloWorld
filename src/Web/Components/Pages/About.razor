@@ -1,0 +1,55 @@
+@page "/about"
+@page "/p/{Slug}"
+@inject Ignite.Application.Interfaces.Services.Entities.IPageService PageService
+@inject Ignite.Application.Interfaces.Services.Entities.IMinistryService MinistryService
+
+<PageTitle>@(_page?.Title ?? "About") · Ignite</PageTitle>
+<section class="section">
+    <div class="container">
+        @if (_page is not null)
+        {
+            <div class="narrow">
+                <div class="kicker">Ignite</div>
+                <h1>@_page.Title</h1>
+                @((MarkupString)_page.BodyHtml)
+            </div>
+        }
+        @if (_ministries.Count > 0 && string.Equals(Slug ?? "about", "about", StringComparison.OrdinalIgnoreCase))
+        {
+            <div style="margin-top:3rem">
+                <h2>Ministries</h2>
+                <div class="grid grid-3">
+                    @foreach (var ministry in _ministries)
+                    {
+                        <article class="card">
+                            <h3>@ministry.Name</h3>
+                            <p>@ministry.Description</p>
+                            @if (!string.IsNullOrWhiteSpace(ministry.LeaderName))
+                            {
+                                <p class="meta">@ministry.LeaderName</p>
+                            }
+                        </article>
+                    }
+                </div>
+            </div>
+        }
+    </div>
+</section>
+
+@code {
+    [Parameter] public string? Slug { get; set; }
+    private PageDto? _page;
+    private IReadOnlyList<MinistryDto> _ministries = [];
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var slug = string.IsNullOrWhiteSpace(Slug) ? "about" : Slug;
+        var page = await PageService.GetBySlugAsync(slug);
+        _page = page.IsSuccess ? page.Data : null;
+        if (slug == "about")
+        {
+            var ministries = await MinistryService.GetAllAsync(publishedOnly: true);
+            if (ministries.IsSuccess && ministries.Data is not null) _ministries = ministries.Data;
+        }
+    }
+}

@@ -1,0 +1,111 @@
+﻿@page "/"
+@inject Ignite.Application.Interfaces.Services.Application.IChurchSiteService SiteService
+
+<PageTitle>@(_home?.Settings.Name ?? "Ignite Church")</PageTitle>
+
+@if (_home is null)
+{
+    <section class="hero"><p>Loading Ignite...</p></section>
+}
+else
+{
+    <section class="hero">
+        <div>
+            <div class="kicker">@_home.Settings.Tagline</div>
+            <h1>@_home.Settings.HeroTitle</h1>
+            <p>@_home.Settings.HeroSubtitle</p>
+            <div class="hero-actions">
+                <a class="btn btn-gold" href="/locations">Find a location</a>
+                <a class="btn btn-ghost" href="/watch">Watch online</a>
+                <a class="btn btn-ghost" href="/connect">Connect</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="section">
+        <div class="container">
+            <div class="section-head">
+                <div>
+                    <div class="kicker">Our locations</div>
+                    <h2>Join us this weekend</h2>
+                </div>
+                <a class="btn btn-ghost" href="/locations">All campuses</a>
+            </div>
+            <div class="grid grid-3">
+                @foreach (var campus in _home.Campuses)
+                {
+                    <a class="card" href="@($"/locations/{campus.Slug}")">
+                        <div class="meta">@(campus.IsOnlineCampus ? "Online" : campus.Country)</div>
+                        <h3>@campus.Name</h3>
+                        <p>@campus.City@(string.IsNullOrWhiteSpace(campus.Region) ? "" : $", {campus.Region}")</p>
+                        @if (campus.ServiceTimes.Count > 0)
+                        {
+                            <p>@campus.ServiceTimes[0].Day @campus.ServiceTimes[0].TimeLabel · @campus.ServiceTimes[0].Title</p>
+                        }
+                    </a>
+                }
+            </div>
+        </div>
+    </section>
+
+    <section class="section alt">
+        <div class="container grid grid-3">
+            <div class="card">
+                <div class="kicker">Watch</div>
+                <h3>Join from anywhere</h3>
+                <p>Weekly services, kids content, and messages you can share with family.</p>
+                <a class="btn btn-gold" href="/watch">Watch now</a>
+            </div>
+            <div class="card">
+                <div class="kicker">Give</div>
+                <h3>@_home.Settings.GivingHeadline</h3>
+                <p>@_home.Settings.GivingBody</p>
+                <a class="btn btn-gold" href="/give">Give online</a>
+            </div>
+            <div class="card">
+                <div class="kicker">Next step</div>
+                <h3>We would love to connect</h3>
+                <p>Tell us how we can pray for you, help you visit, or find a group.</p>
+                <a class="btn btn-gold" href="/connect">Connect with us</a>
+            </div>
+        </div>
+    </section>
+
+    @if (_home.UpcomingEvents.Count > 0)
+    {
+        <section class="section">
+            <div class="container">
+                <div class="section-head">
+                    <div>
+                        <div class="kicker">What's on</div>
+                        <h2>Upcoming events</h2>
+                    </div>
+                    <a class="btn btn-ghost" href="/events">All events</a>
+                </div>
+                <div class="grid grid-3">
+                    @foreach (var ev in _home.UpcomingEvents)
+                    {
+                        <a class="card" href="@($"/events/{ev.Slug}")">
+                            <div class="meta">@ev.StartsAtUtc.ToString("ddd d MMM")</div>
+                            <h3>@ev.Title</h3>
+                            <p>@(ev.LocationName ?? ev.CampusName)</p>
+                        </a>
+                    }
+                </div>
+            </div>
+        </section>
+    }
+}
+
+@code {
+    private HomePageDto? _home;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await SiteService.GetHomeAsync();
+        if (result.IsSuccess)
+        {
+            _home = result.Data;
+        }
+    }
+}

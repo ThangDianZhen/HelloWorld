@@ -1,0 +1,48 @@
+@inherits LayoutComponentBase
+@inject Ignite.Application.Interfaces.Services.Entities.IChurchSettingsService SettingsService
+
+<div class="site-header">
+    <a class="brand" href="/">@ChurchName</a>
+    <nav class="nav">
+        <NavLink href="/locations">Locations</NavLink>
+        <NavLink href="/watch">Watch</NavLink>
+        <NavLink href="/events">Events</NavLink>
+        <NavLink href="/give">Give</NavLink>
+        <NavLink href="/connect">Connect</NavLink>
+        <NavLink href="/about">About</NavLink>
+        <NavLink class="btn btn-gold" href="/admin">Admin</NavLink>
+    </nav>
+</div>
+
+<main>
+    @Body
+</main>
+
+<footer class="footer">
+    <div class="container footer-row">
+        <div>
+            <strong>@ChurchName</strong>
+            <p>@FooterNote</p>
+        </div>
+        <div>
+            <a href="/connect">Connect</a> ·
+            <a href="/give">Give</a> ·
+            <a href="/admin/login">Staff login</a>
+        </div>
+    </div>
+</footer>
+
+@code {
+    private string ChurchName = "Ignite";
+    private string FooterNote = "A church for your city.";
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await SettingsService.GetAsync();
+        if (result.IsSuccess && result.Data is not null)
+        {
+            ChurchName = result.Data.Name;
+            FooterNote = string.IsNullOrWhiteSpace(result.Data.FooterNote) ? result.Data.Tagline : result.Data.FooterNote;
+        }
+    }
+}

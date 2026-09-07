@@ -1,0 +1,35 @@
+@page "/admin/login"
+@page "/admin/login/{*ignored}"
+@layout PublicLayout
+@attribute [AllowAnonymous]
+
+<PageTitle>Staff login · Ignite</PageTitle>
+<section class="section">
+    <div class="container narrow">
+        <div class="kicker">Ignite CMS</div>
+        <h1>Staff login</h1>
+        <p>Use your church admin account to manage campuses, sermons, events, and connect requests.</p>
+        @if (ShowError)
+        {
+            <p class="error">That email or password is not right.</p>
+        }
+        <form class="form" method="post" action="/account/login">
+            <AntiforgeryToken />
+            <input type="hidden" name="returnUrl" value="/admin" />
+            <label>Email
+                <input type="email" name="email" value="admin@ignitechurch.local" required />
+            </label>
+            <label>Password
+                <input type="password" name="password" required />
+            </label>
+            <button class="btn btn-gold" type="submit">Sign in</button>
+        </form>
+        <p class="meta" style="margin-top:1rem">Default demo login is in the README.</p>
+    </div>
+</section>
+
+@code {
+    [SupplyParameterFromQuery] public int? Error { get; set; }
+    [Parameter] public string? Ignored { get; set; }
+    private bool ShowError => Error == 1;
+}

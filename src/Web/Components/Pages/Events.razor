@@ -1,0 +1,35 @@
+@page "/events"
+@inject Ignite.Application.Interfaces.Services.Entities.IEventService EventService
+
+<PageTitle>Events · Ignite</PageTitle>
+<section class="section">
+    <div class="container">
+        <div class="kicker">Calendar</div>
+        <h1>Events</h1>
+        <div class="grid grid-3" style="margin-top:2rem">
+            @foreach (var ev in _events)
+            {
+                <a class="card" href="@($"/events/{ev.Slug}")">
+                    <div class="meta">@ev.StartsAtUtc.ToString("ddd d MMM yyyy")</div>
+                    <h3>@ev.Title</h3>
+                    <p>@(ev.LocationName ?? ev.CampusName)</p>
+                    <p>@ev.Description</p>
+                </a>
+            }
+        </div>
+        @if (_events.Count == 0)
+        {
+            <p>No upcoming events yet. Check back soon.</p>
+        }
+    </div>
+</section>
+
+@code {
+    private IReadOnlyList<ChurchEventDto> _events = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await EventService.GetUpcomingAsync(publishedOnly: true);
+        if (result.IsSuccess && result.Data is not null) _events = result.Data;
+    }
+}

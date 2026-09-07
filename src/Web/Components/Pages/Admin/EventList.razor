@@ -1,0 +1,37 @@
+@page "/admin/events"
+@layout AdminLayout
+@attribute [Authorize(Roles = Ignite.Core.Constants.Roles.Admin)]
+@rendermode InteractiveServer
+@inject Ignite.Application.Interfaces.Services.Entities.IEventService EventService
+
+<div class="admin-top"><h1>Events</h1><a class="btn btn-gold" href="/admin/events/new">Add event</a></div>
+<table class="table">
+    <thead><tr><th>Title</th><th>Starts</th><th></th></tr></thead>
+    <tbody>
+    @foreach (var ev in _items)
+    {
+        <tr>
+            <td>@ev.Title</td>
+            <td>@ev.StartsAtUtc.ToString("g")</td>
+            <td>
+                <a href="@($"/admin/events/{ev.Id}")">Edit</a>
+                <button class="btn btn-ghost" @onclick="() => Delete(ev.Id)">Delete</button>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+@code {
+    private IReadOnlyList<ChurchEventDto> _items = [];
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await EventService.GetAllAsync(publishedOnly: false);
+        if (result.IsSuccess && result.Data is not null) _items = result.Data;
+    }
+    private async Task Delete(Guid id)
+    {
+        await EventService.DeleteAsync(id);
+        var result = await EventService.GetAllAsync(publishedOnly: false);
+        if (result.IsSuccess && result.Data is not null) _items = result.Data;
+    }
+}

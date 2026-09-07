@@ -1,0 +1,39 @@
+@page "/admin/pages/new"
+@page "/admin/pages/{Id:guid}"
+@layout AdminLayout
+@attribute [Authorize(Roles = Ignite.Core.Constants.Roles.Admin)]
+@rendermode InteractiveServer
+@inject Ignite.Application.Interfaces.Services.Entities.IPageService PageService
+@inject NavigationManager Nav
+
+<div class="admin-top"><h1>@(Id is null ? "New page" : "Edit page")</h1></div>
+<EditForm Model="_form" OnValidSubmit="Save" class="form">
+    <label>Title <InputText @bind-Value="_form.Title" /></label>
+    <label>Slug <InputText @bind-Value="_form.Slug" /></label>
+    <label>Summary <InputText @bind-Value="_form.Summary" /></label>
+    <label>Body HTML <InputTextArea @bind-Value="_form.BodyHtml" /></label>
+    <label><InputCheckbox @bind-Value="_form.IsPublished" /> Published</label>
+    @if (!string.IsNullOrWhiteSpace(_error)) { <p class="error">@_error</p> }
+    <button class="btn btn-gold" type="submit">Save</button>
+</EditForm>
+@code {
+    [Parameter] public Guid? Id { get; set; }
+    private PageWriteDto _form = new() { IsPublished = true };
+    private string _error = string.Empty;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id is null) return;
+        var result = await PageService.GetByIdAsync(Id.Value);
+        if (!result.IsSuccess || result.Data is null) return;
+        var p = result.Data;
+        _form = new PageWriteDto { Title = p.Title, Slug = p.Slug, Summary = p.Summary, BodyHtml = p.BodyHtml, IsPublished = p.IsPublished, SortOrder = p.SortOrder };
+    }
+
+    private async Task Save()
+    {
+        var result = Id is null ? await PageService.CreateAsync(_form) : await PageService.UpdateAsync(Id.Value, _form);
+        if (result.IsSuccess) Nav.NavigateTo("/admin/pages");
+        else _error = result.HasErrors ? string.Join(" ", result.Errors) : result.ErrorHeader;
+    }
+}

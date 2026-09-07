@@ -1,0 +1,69 @@
+@page "/admin/ministries"
+@page "/admin/ministries/{Id:guid}"
+@page "/admin/ministries/new"
+@layout AdminLayout
+@attribute [Authorize(Roles = Ignite.Core.Constants.Roles.Admin)]
+@rendermode InteractiveServer
+@inject Ignite.Application.Interfaces.Services.Entities.IMinistryService MinistryService
+@inject NavigationManager Nav
+
+@if (Id is null && !Creating)
+{
+    <div class="admin-top"><h1>Ministries</h1><a class="btn btn-gold" href="/admin/ministries/new">Add ministry</a></div>
+    <table class="table">
+        <thead><tr><th>Name</th><th></th></tr></thead>
+        <tbody>
+        @foreach (var item in _items)
+        {
+            <tr>
+                <td>@item.Name</td>
+                <td><a href="@($"/admin/ministries/{item.Id}")">Edit</a></td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="admin-top"><h1>@(Creating ? "New ministry" : "Edit ministry")</h1></div>
+    <EditForm Model="_form" OnValidSubmit="Save" class="form">
+        <label>Name <InputText @bind-Value="_form.Name" /></label>
+        <label>Description <InputTextArea @bind-Value="_form.Description" /></label>
+        <label>Leader <InputText @bind-Value="_form.LeaderName" /></label>
+        <label><InputCheckbox @bind-Value="_form.IsPublished" /> Published</label>
+        @if (!string.IsNullOrWhiteSpace(_error)) { <p class="error">@_error</p> }
+        <button class="btn btn-gold" type="submit">Save</button>
+    </EditForm>
+}
+
+@code {
+    [Parameter] public Guid? Id { get; set; }
+    private bool Creating => string.Equals(Nav.ToBaseRelativePath(Nav.Uri).TrimEnd('/'), "admin/ministries/new", StringComparison.OrdinalIgnoreCase);
+    private IReadOnlyList<MinistryDto> _items = [];
+    private MinistryWriteDto _form = new() { IsPublished = true };
+    private string _error = string.Empty;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id is null && !Creating)
+        {
+            var result = await MinistryService.GetAllAsync(publishedOnly: false);
+            if (result.IsSuccess && result.Data is not null) _items = result.Data;
+            return;
+        }
+        if (Id is null) return;
+        var existing = await MinistryService.GetByIdAsync(Id.Value);
+        if (existing.IsSuccess && existing.Data is not null)
+        {
+            var m = existing.Data;
+            _form = new MinistryWriteDto { Name = m.Name, Slug = m.Slug, Description = m.Description, LeaderName = m.LeaderName, IsPublished = m.IsPublished, SortOrder = m.SortOrder };
+        }
+    }
+
+    private async Task Save()
+    {
+        var result = Id is null ? await MinistryService.CreateAsync(_form) : await MinistryService.UpdateAsync(Id.Value, _form);
+        if (result.IsSuccess) Nav.NavigateTo("/admin/ministries");
+        else _error = result.HasErrors ? string.Join(" ", result.Errors) : result.ErrorHeader;
+    }
+}

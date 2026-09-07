@@ -1,0 +1,47 @@
+@page "/admin/sermons/new"
+@page "/admin/sermons/{Id:guid}"
+@layout AdminLayout
+@attribute [Authorize(Roles = Ignite.Core.Constants.Roles.Admin)]
+@rendermode InteractiveServer
+@inject Ignite.Application.Interfaces.Services.Entities.ISermonService SermonService
+@inject NavigationManager Nav
+
+<div class="admin-top"><h1>@(Id is null ? "New sermon" : "Edit sermon")</h1></div>
+<EditForm Model="_form" OnValidSubmit="Save" class="form">
+    <label>Title <InputText @bind-Value="_form.Title" /></label>
+    <div class="field-row">
+        <label>Speaker <InputText @bind-Value="_form.Speaker" /></label>
+        <label>Series <InputText @bind-Value="_form.Series" /></label>
+    </div>
+    <label>Preached on <InputDate @bind-Value="_form.PreachedOn" /></label>
+    <label>Video URL <InputText @bind-Value="_form.VideoUrl" /></label>
+    <label>Description <InputTextArea @bind-Value="_form.Description" /></label>
+    <label><InputCheckbox @bind-Value="_form.IsPublished" /> Published</label>
+    @if (!string.IsNullOrWhiteSpace(_error)) { <p class="error">@_error</p> }
+    <button class="btn btn-gold" type="submit">Save</button>
+</EditForm>
+@code {
+    [Parameter] public Guid? Id { get; set; }
+    private SermonWriteDto _form = new() { IsPublished = true };
+    private string _error = string.Empty;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id is null) return;
+        var result = await SermonService.GetByIdAsync(Id.Value);
+        if (!result.IsSuccess || result.Data is null) return;
+        var s = result.Data;
+        _form = new SermonWriteDto
+        {
+            Title = s.Title, Speaker = s.Speaker, Series = s.Series, PreachedOn = s.PreachedOn,
+            VideoUrl = s.VideoUrl, Description = s.Description, IsPublished = s.IsPublished, CampusId = s.CampusId
+        };
+    }
+
+    private async Task Save()
+    {
+        var result = Id is null ? await SermonService.CreateAsync(_form) : await SermonService.UpdateAsync(Id.Value, _form);
+        if (result.IsSuccess) Nav.NavigateTo("/admin/sermons");
+        else _error = result.HasErrors ? string.Join(" ", result.Errors) : result.ErrorHeader;
+    }
+}

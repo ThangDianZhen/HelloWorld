@@ -1,0 +1,41 @@
+@page "/admin/connect"
+@layout AdminLayout
+@attribute [Authorize(Roles = Ignite.Core.Constants.Roles.Admin)]
+@rendermode InteractiveServer
+@inject Ignite.Application.Interfaces.Services.Entities.IConnectRequestService ConnectService
+
+<div class="admin-top"><h1>Connect inbox</h1></div>
+<table class="table">
+    <thead><tr><th>When</th><th>Name</th><th>Email</th><th>Message</th><th></th></tr></thead>
+    <tbody>
+    @foreach (var item in _items)
+    {
+        <tr>
+            <td>@item.SubmittedAtUtc.ToString("g")</td>
+            <td>@item.FirstName @item.LastName @(item.IsRead ? "" : "•")</td>
+            <td>@item.Email</td>
+            <td>@item.Message</td>
+            <td>
+                @if (!item.IsRead)
+                {
+                    <button class="btn btn-ghost" @onclick="() => MarkRead(item.Id)">Mark read</button>
+                }
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+@code {
+    private IReadOnlyList<ConnectRequestDto> _items = [];
+    protected override async Task OnInitializedAsync() => await Load();
+    private async Task Load()
+    {
+        var result = await ConnectService.GetAllAsync();
+        if (result.IsSuccess && result.Data is not null) _items = result.Data;
+    }
+    private async Task MarkRead(Guid id)
+    {
+        await ConnectService.MarkReadAsync(id);
+        await Load();
+    }
+}

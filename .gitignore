@@ -1,0 +1,28 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+*.userprefs
+project.lock.json
+project.fragment.lock.json
+artifacts/
+*.nuget.props
+*.nuget.targets
+
+## Database
+*.db
+*.db-shm
+*.db-wal
+
+## IDE
+.vs/
+.idea/
+*.swp
+.DS_Store
+
+## Logs
+*.log
+logs/

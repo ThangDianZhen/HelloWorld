@@ -1,0 +1,41 @@
+@page "/admin"
+@layout AdminLayout
+@attribute [Authorize(Roles = Ignite.Core.Constants.Roles.Admin)]
+@inject Ignite.Application.Interfaces.Services.Application.IChurchSiteService SiteService
+@inject Ignite.Application.Interfaces.Services.Entities.IConnectRequestService ConnectService
+
+<PageTitle>Dashboard · Ignite CMS</PageTitle>
+<div class="admin-top">
+    <div>
+        <div class="kicker">Overview</div>
+        <h1>Welcome back</h1>
+    </div>
+    <a class="btn btn-ghost" href="/" target="_blank">View website</a>
+</div>
+<div class="grid grid-3">
+    <div class="card"><div class="meta">Campuses</div><h2>@_campusCount</h2></div>
+    <div class="card"><div class="meta">Upcoming events</div><h2>@_eventCount</h2></div>
+    <div class="card"><div class="meta">Unread connect</div><h2>@_unread</h2></div>
+</div>
+<p style="margin-top:2rem">Use the menu to update locations, sermons, and the public site. The same data is also available at <code>/swagger</code>.</p>
+
+@code {
+    private int _campusCount;
+    private int _eventCount;
+    private int _unread;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var home = await SiteService.GetHomeAsync();
+        if (home.IsSuccess && home.Data is not null)
+        {
+            _campusCount = home.Data.Campuses.Count;
+            _eventCount = home.Data.UpcomingEvents.Count;
+        }
+        var inbox = await ConnectService.GetAllAsync();
+        if (inbox.IsSuccess && inbox.Data is not null)
+        {
+            _unread = inbox.Data.Count(x => !x.IsRead);
+        }
+    }
+}
