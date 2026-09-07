@@ -1,0 +1,32 @@
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@using Ignite.Web.Components.Layout
+
+<Router AppAssembly="typeof(Program).Assembly">
+    <Found Context="routeData">
+        <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(PublicLayout)">
+            <NotAuthorized>
+                <LayoutView Layout="typeof(PublicLayout)">
+                    <section class="section">
+                        <div class="container narrow">
+                            <h1>Please sign in</h1>
+                            <p>You need an admin account to manage Ignite.</p>
+                            <a class="btn btn-gold" href="/admin/login">Admin login</a>
+                        </div>
+                    </section>
+                </LayoutView>
+            </NotAuthorized>
+        </AuthorizeRouteView>
+        <FocusOnNavigate RouteData="routeData" Selector="h1" />
+    </Found>
+    <NotFound>
+        <LayoutView Layout="typeof(PublicLayout)">
+            <section class="section">
+                <div class="container narrow">
+                    <h1>Page not found</h1>
+                    <p>That page is not in Ignite yet.</p>
+                    <a class="btn btn-gold" href="/">Back home</a>
+                </div>
+            </section>
+        </LayoutView>
+    </NotFound>
+</Router>

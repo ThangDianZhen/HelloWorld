@@ -1,0 +1,23 @@
+﻿@page "/Error"
+@using System.Diagnostics
+
+<PageTitle>Error</PageTitle>
+<section class="section">
+    <div class="container narrow">
+        <h1>Something went wrong</h1>
+        <p>Please try again, or contact the church team if this keeps happening.</p>
+        @if (ShowRequestId)
+        {
+            <p class="meta">Request ID: @RequestId</p>
+        }
+    </div>
+</section>
+
+@code {
+    [CascadingParameter] private HttpContext? HttpContext { get; set; }
+    private string? RequestId { get; set; }
+    private bool ShowRequestId => !string.IsNullOrEmpty(RequestId);
+
+    protected override void OnInitialized()
+        => RequestId = Activity.Current?.Id ?? HttpContext?.TraceIdentifier;
+}

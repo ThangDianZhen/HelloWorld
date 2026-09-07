@@ -1,0 +1,70 @@
+@page "/connect"
+@rendermode InteractiveServer
+@inject Ignite.Application.Interfaces.Services.Entities.IConnectRequestService ConnectService
+
+<PageTitle>Connect · Ignite</PageTitle>
+<section class="section">
+    <div class="container narrow">
+        <div class="kicker">We would love to meet you</div>
+        <h1>Connect with us</h1>
+        <p>Tell us how we can help — a first visit, prayer, or finding your place in the church.</p>
+
+        @if (_submitted)
+        {
+            <p class="ok">@_message</p>
+        }
+        else
+        {
+            <EditForm Model="_form" OnValidSubmit="Submit" class="form">
+                <DataAnnotationsValidator />
+                <div class="field-row">
+                    <label>First name
+                        <InputText @bind-Value="_form.FirstName" />
+                    </label>
+                    <label>Last name
+                        <InputText @bind-Value="_form.LastName" />
+                    </label>
+                </div>
+                <label>Email
+                    <InputText @bind-Value="_form.Email" />
+                </label>
+                <label>Mobile
+                    <InputText @bind-Value="_form.Phone" />
+                </label>
+                <label>
+                    <InputCheckbox @bind-Value="_form.AttendsChurch" /> I already attend Ignite
+                </label>
+                <label>How can we help?
+                    <InputTextArea @bind-Value="_form.Message" />
+                </label>
+                @if (!string.IsNullOrWhiteSpace(_error))
+                {
+                    <p class="error">@_error</p>
+                }
+                <button class="btn btn-gold" type="submit">Send</button>
+            </EditForm>
+        }
+    </div>
+</section>
+
+@code {
+    private ConnectRequestWriteDto _form = new();
+    private bool _submitted;
+    private string _message = string.Empty;
+    private string _error = string.Empty;
+
+    private async Task Submit()
+    {
+        _error = string.Empty;
+        var result = await ConnectService.SubmitAsync(_form);
+        if (result.IsSuccess)
+        {
+            _submitted = true;
+            _message = string.IsNullOrWhiteSpace(result.Message) ? "Thank you. We will be in touch." : result.Message;
+        }
+        else
+        {
+            _error = result.HasErrors ? string.Join(" ", result.Errors) : result.ErrorHeader;
+        }
+    }
+}

@@ -1,0 +1,51 @@
+@page "/locations/{Slug}"
+@inject Ignite.Application.Interfaces.Services.Entities.ICampusService CampusService
+
+<PageTitle>@(_campus?.Name ?? "Location") · Ignite</PageTitle>
+<section class="section">
+    <div class="container narrow">
+        @if (_campus is null)
+        {
+            <p>@_error</p>
+        }
+        else
+        {
+            <div class="kicker">@(_campus.IsOnlineCampus ? "Online" : _campus.Country)</div>
+            <h1>@_campus.Name</h1>
+            <p>@_campus.Description</p>
+            <div class="card" style="margin:1.5rem 0">
+                <div class="meta">Service times</div>
+                @foreach (var time in _campus.ServiceTimes)
+                {
+                    <p><strong>@time.Day</strong> · @time.TimeLabel · @time.Title @(string.IsNullOrWhiteSpace(time.Notes) ? "" : $"({time.Notes})")</p>
+                }
+                <p>@_campus.Address</p>
+                @if (!string.IsNullOrWhiteSpace(_campus.ContactEmail))
+                {
+                    <p>@_campus.ContactEmail</p>
+                }
+            </div>
+            <a class="btn btn-gold" href="/connect">Plan a visit</a>
+        }
+    </div>
+</section>
+
+@code {
+    [Parameter] public string Slug { get; set; } = string.Empty;
+    private CampusDto? _campus;
+    private string _error = "Loading...";
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var result = await CampusService.GetBySlugAsync(Slug);
+        if (result.IsSuccess)
+        {
+            _campus = result.Data;
+        }
+        else
+        {
+            _campus = null;
+            _error = result.ErrorMessage;
+        }
+    }
+}

@@ -1,0 +1,6 @@
+@Ignite.WebApi_HostAddress = http://localhost:5055
+
+GET {{Ignite.WebApi_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

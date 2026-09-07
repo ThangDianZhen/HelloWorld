@@ -1,0 +1,96 @@
+@page "/admin/campuses/new"
+@page "/admin/campuses/{Id:guid}"
+@layout AdminLayout
+@attribute [Authorize(Roles = Ignite.Core.Constants.Roles.Admin)]
+@rendermode InteractiveServer
+@inject Ignite.Application.Interfaces.Services.Entities.ICampusService CampusService
+@inject NavigationManager Nav
+@using Ignite.Core.Enums
+
+<div class="admin-top"><h1>@(Id is null ? "New campus" : "Edit campus")</h1></div>
+<EditForm Model="_form" OnValidSubmit="Save" class="form">
+    <label>Name <InputText @bind-Value="_form.Name" /></label>
+    <div class="field-row">
+        <label>City <InputText @bind-Value="_form.City" /></label>
+        <label>Country <InputText @bind-Value="_form.Country" /></label>
+    </div>
+    <label>Address <InputText @bind-Value="_form.Address" /></label>
+    <label>Description <InputTextArea @bind-Value="_form.Description" /></label>
+    <label><InputCheckbox @bind-Value="_form.IsOnlineCampus" /> Online campus</label>
+    <label><InputCheckbox @bind-Value="_form.IsPublished" /> Published</label>
+    <h3>Service times</h3>
+    @for (var i = 0; i < _form.ServiceTimes.Count; i++)
+    {
+        var index = i;
+        <div class="field-row">
+            <label>Day
+                <InputSelect @bind-Value="_form.ServiceTimes[index].Day">
+                    @foreach (var day in Enum.GetValues<ServiceDay>())
+                    {
+                        <option value="@day">@day</option>
+                    }
+                </InputSelect>
+            </label>
+            <label>Time <InputText @bind-Value="_form.ServiceTimes[index].TimeLabel" /></label>
+            <label>Title <InputText @bind-Value="_form.ServiceTimes[index].Title" /></label>
+        </div>
+    }
+    <button class="btn btn-ghost" type="button" @onclick="AddTime">Add service time</button>
+    @if (!string.IsNullOrWhiteSpace(_error)) { <p class="error">@_error</p> }
+    <div><button class="btn btn-gold" type="submit">Save</button></div>
+</EditForm>
+
+@code {
+    [Parameter] public Guid? Id { get; set; }
+    private CampusWriteDto _form = new() { IsPublished = true, Country = "Malaysia" };
+    private string _error = string.Empty;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        if (Id is null)
+        {
+            if (_form.ServiceTimes.Count == 0)
+            {
+                _form.ServiceTimes.Add(new ServiceTimeWriteDto { TimeLabel = "10:00 AM", Title = "Main Service" });
+            }
+            return;
+        }
+
+        var result = await CampusService.GetByIdAsync(Id.Value);
+        if (!result.IsSuccess || result.Data is null) return;
+        var c = result.Data;
+        _form = new CampusWriteDto
+        {
+            Name = c.Name,
+            Slug = c.Slug,
+            City = c.City,
+            Region = c.Region,
+            Country = c.Country,
+            Address = c.Address,
+            Description = c.Description,
+            IsOnlineCampus = c.IsOnlineCampus,
+            IsPublished = c.IsPublished,
+            SortOrder = c.SortOrder,
+            ServiceTimes = c.ServiceTimes.Select(t => new ServiceTimeWriteDto
+            {
+                Id = t.Id,
+                Day = t.Day,
+                TimeLabel = t.TimeLabel,
+                Title = t.Title,
+                Notes = t.Notes,
+                SortOrder = t.SortOrder
+            }).ToList()
+        };
+    }
+
+    private void AddTime() => _form.ServiceTimes.Add(new ServiceTimeWriteDto { TimeLabel = "10:00 AM", Title = "Main Service" });
+
+    private async Task Save()
+    {
+        var result = Id is null
+            ? await CampusService.CreateAsync(_form)
+            : await CampusService.UpdateAsync(Id.Value, _form);
+        if (result.IsSuccess) Nav.NavigateTo("/admin/campuses");
+        else _error = result.HasErrors ? string.Join(" ", result.Errors) : result.ErrorHeader;
+    }
+}

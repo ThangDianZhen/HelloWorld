@@ -1,0 +1,25 @@
+@inherits LayoutComponentBase
+@using Microsoft.AspNetCore.Authorization
+@attribute [Authorize(Roles = Ignite.Core.Constants.Roles.Admin)]
+
+<div class="admin">
+    <aside class="admin-side">
+        <a class="brand" href="/">Ignite CMS</a>
+        <p class="meta">Church admin</p>
+        <NavLink href="/admin" Match="NavLinkMatch.All">Dashboard</NavLink>
+        <NavLink href="/admin/campuses">Campuses</NavLink>
+        <NavLink href="/admin/sermons">Sermons</NavLink>
+        <NavLink href="/admin/events">Events</NavLink>
+        <NavLink href="/admin/pages">Pages</NavLink>
+        <NavLink href="/admin/ministries">Ministries</NavLink>
+        <NavLink href="/admin/connect">Connect inbox</NavLink>
+        <NavLink href="/admin/settings">Settings</NavLink>
+        <form method="post" action="/account/logout" style="margin-top:1.5rem">
+            <AntiforgeryToken />
+            <button class="btn btn-ghost" type="submit">Sign out</button>
+        </form>
+    </aside>
+    <div class="admin-main">
+        @Body
+    </div>
+</div>

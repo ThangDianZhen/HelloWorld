@@ -1,0 +1,45 @@
+@page "/admin/campuses"
+@layout AdminLayout
+@attribute [Authorize(Roles = Ignite.Core.Constants.Roles.Admin)]
+@rendermode InteractiveServer
+@inject Ignite.Application.Interfaces.Services.Entities.ICampusService CampusService
+
+<div class="admin-top">
+    <h1>Campuses</h1>
+    <a class="btn btn-gold" href="/admin/campuses/new">Add campus</a>
+</div>
+<table class="table">
+    <thead><tr><th>Name</th><th>City</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+    @foreach (var campus in _campuses)
+    {
+        <tr>
+            <td>@campus.Name</td>
+            <td>@campus.City</td>
+            <td>@(campus.IsPublished ? "Published" : "Draft")</td>
+            <td>
+                <a href="@($"/admin/campuses/{campus.Id}")">Edit</a>
+                <button class="btn btn-ghost" @onclick="() => Delete(campus.Id)">Delete</button>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+@code {
+    private IReadOnlyList<CampusDto> _campuses = [];
+
+    protected override async Task OnInitializedAsync() => await Load();
+
+    private async Task Load()
+    {
+        var result = await CampusService.GetAllAsync(publishedOnly: false);
+        if (result.IsSuccess && result.Data is not null) _campuses = result.Data;
+    }
+
+    private async Task Delete(Guid id)
+    {
+        await CampusService.DeleteAsync(id);
+        await Load();
+    }
+}

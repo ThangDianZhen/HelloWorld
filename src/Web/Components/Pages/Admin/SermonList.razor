@@ -1,0 +1,34 @@
+@page "/admin/sermons"
+@layout AdminLayout
+@attribute [Authorize(Roles = Ignite.Core.Constants.Roles.Admin)]
+@rendermode InteractiveServer
+@inject Ignite.Application.Interfaces.Services.Entities.ISermonService SermonService
+
+<div class="admin-top"><h1>Sermons</h1><a class="btn btn-gold" href="/admin/sermons/new">Add sermon</a></div>
+<table class="table">
+    <thead><tr><th>Title</th><th>Speaker</th><th>Date</th><th></th></tr></thead>
+    <tbody>
+    @foreach (var sermon in _items)
+    {
+        <tr>
+            <td>@sermon.Title</td>
+            <td>@sermon.Speaker</td>
+            <td>@sermon.PreachedOn.ToString("d MMM yyyy")</td>
+            <td>
+                <a href="@($"/admin/sermons/{sermon.Id}")">Edit</a>
+                <button class="btn btn-ghost" @onclick="() => Delete(sermon.Id)">Delete</button>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+@code {
+    private IReadOnlyList<SermonDto> _items = [];
+    protected override async Task OnInitializedAsync() => await Load();
+    private async Task Load()
+    {
+        var result = await SermonService.GetLatestAsync(100, publishedOnly: false);
+        if (result.IsSuccess && result.Data is not null) _items = result.Data;
+    }
+    private async Task Delete(Guid id) { await SermonService.DeleteAsync(id); await Load(); }
+}

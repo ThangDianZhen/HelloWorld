@@ -1,0 +1,64 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.31903.59
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{BC5187A3-230F-4E7B-83AF-C7336718F4F2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ignite.Core", "src\Core\Ignite.Core.csproj", "{42F47FC3-CAE5-47BF-B7F7-9E4A1109AA2E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ignite.Application", "src\Application\Ignite.Application.csproj", "{D5A42F9E-00C9-4CB6-B141-2A3333ED58F3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ignite.Infrastructure", "src\Infrastructure\Ignite.Infrastructure.csproj", "{5C17A85F-3318-49D1-B6D3-08788E47B6D2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ignite.WebApi", "src\WebApi\Ignite.WebApi.csproj", "{A8E8D3BC-7C85-4C9E-A10A-592169C6C021}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ignite.Web", "src\Web\Ignite.Web.csproj", "{A819F729-8AEB-42AE-9BB5-F4D2EBE941B0}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{FD8200AC-4046-44BA-BAB2-F3CF94CC9B33}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Ignite.Application.Tests", "tests\Ignite.Application.Tests\Ignite.Application.Tests.csproj", "{0653D119-E59E-41E4-BFDF-C8B42AE6D708}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{42F47FC3-CAE5-47BF-B7F7-9E4A1109AA2E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{42F47FC3-CAE5-47BF-B7F7-9E4A1109AA2E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{42F47FC3-CAE5-47BF-B7F7-9E4A1109AA2E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{42F47FC3-CAE5-47BF-B7F7-9E4A1109AA2E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D5A42F9E-00C9-4CB6-B141-2A3333ED58F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D5A42F9E-00C9-4CB6-B141-2A3333ED58F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D5A42F9E-00C9-4CB6-B141-2A3333ED58F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D5A42F9E-00C9-4CB6-B141-2A3333ED58F3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5C17A85F-3318-49D1-B6D3-08788E47B6D2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5C17A85F-3318-49D1-B6D3-08788E47B6D2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5C17A85F-3318-49D1-B6D3-08788E47B6D2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5C17A85F-3318-49D1-B6D3-08788E47B6D2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A8E8D3BC-7C85-4C9E-A10A-592169C6C021}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A8E8D3BC-7C85-4C9E-A10A-592169C6C021}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A8E8D3BC-7C85-4C9E-A10A-592169C6C021}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A8E8D3BC-7C85-4C9E-A10A-592169C6C021}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A819F729-8AEB-42AE-9BB5-F4D2EBE941B0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A819F729-8AEB-42AE-9BB5-F4D2EBE941B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A819F729-8AEB-42AE-9BB5-F4D2EBE941B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A819F729-8AEB-42AE-9BB5-F4D2EBE941B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0653D119-E59E-41E4-BFDF-C8B42AE6D708}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0653D119-E59E-41E4-BFDF-C8B42AE6D708}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0653D119-E59E-41E4-BFDF-C8B42AE6D708}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0653D119-E59E-41E4-BFDF-C8B42AE6D708}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{42F47FC3-CAE5-47BF-B7F7-9E4A1109AA2E} = {BC5187A3-230F-4E7B-83AF-C7336718F4F2}
+		{D5A42F9E-00C9-4CB6-B141-2A3333ED58F3} = {BC5187A3-230F-4E7B-83AF-C7336718F4F2}
+		{5C17A85F-3318-49D1-B6D3-08788E47B6D2} = {BC5187A3-230F-4E7B-83AF-C7336718F4F2}
+		{A8E8D3BC-7C85-4C9E-A10A-592169C6C021} = {BC5187A3-230F-4E7B-83AF-C7336718F4F2}
+		{A819F729-8AEB-42AE-9BB5-F4D2EBE941B0} = {BC5187A3-230F-4E7B-83AF-C7336718F4F2}
+		{0653D119-E59E-41E4-BFDF-C8B42AE6D708} = {FD8200AC-4046-44BA-BAB2-F3CF94CC9B33}
+	EndGlobalSection
+EndGlobal

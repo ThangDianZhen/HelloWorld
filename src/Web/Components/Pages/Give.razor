@@ -1,0 +1,36 @@
+@page "/give"
+@inject Ignite.Application.Interfaces.Services.Entities.IChurchSettingsService SettingsService
+
+<PageTitle>Give · Ignite</PageTitle>
+<section class="section">
+    <div class="container narrow">
+        <div class="kicker">Generosity</div>
+        <h1>@_headline</h1>
+        <p>@_body</p>
+        @if (!string.IsNullOrWhiteSpace(_url))
+        {
+            <p><a class="btn btn-gold" href="@_url" target="_blank" rel="noreferrer">Give now</a></p>
+        }
+        else
+        {
+            <p>Online giving will be connected to Tithely, Pushpay, or your bank when you are ready.</p>
+        }
+    </div>
+</section>
+
+@code {
+    private string _headline = "Give online";
+    private string _body = string.Empty;
+    private string? _url;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await SettingsService.GetAsync();
+        if (result.IsSuccess && result.Data is not null)
+        {
+            _headline = result.Data.GivingHeadline;
+            _body = result.Data.GivingBody;
+            _url = result.Data.GivingUrl;
+        }
+    }
+}

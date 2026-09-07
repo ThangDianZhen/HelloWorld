@@ -1,0 +1,44 @@
+@page "/watch"
+@inject Ignite.Application.Interfaces.Services.Entities.ISermonService SermonService
+@inject Ignite.Application.Interfaces.Services.Entities.IChurchSettingsService SettingsService
+
+<PageTitle>Watch · Ignite</PageTitle>
+<section class="section">
+    <div class="container">
+        <div class="kicker">Messages</div>
+        <h1>Watch online</h1>
+        <p>Join this weekend's livestream or catch up on recent messages.</p>
+        @if (!string.IsNullOrWhiteSpace(_livestream))
+        {
+            <p><a class="btn btn-gold" href="@_livestream" target="_blank" rel="noreferrer">Join livestream</a></p>
+        }
+        <div class="grid grid-3" style="margin-top:2rem">
+            @foreach (var sermon in _sermons)
+            {
+                <article class="card">
+                    <div class="meta">@sermon.PreachedOn.ToString("d MMM yyyy")</div>
+                    <h3>@sermon.Title</h3>
+                    <p>@sermon.Speaker · @(sermon.Series ?? sermon.CampusName)</p>
+                    <p>@sermon.Description</p>
+                    @if (!string.IsNullOrWhiteSpace(sermon.VideoUrl))
+                    {
+                        <a class="btn btn-ghost" href="@sermon.VideoUrl" target="_blank" rel="noreferrer">Watch</a>
+                    }
+                </article>
+            }
+        </div>
+    </div>
+</section>
+
+@code {
+    private IReadOnlyList<SermonDto> _sermons = [];
+    private string? _livestream;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var sermons = await SermonService.GetLatestAsync(12, publishedOnly: true);
+        if (sermons.IsSuccess && sermons.Data is not null) _sermons = sermons.Data;
+        var settings = await SettingsService.GetAsync();
+        if (settings.IsSuccess) _livestream = settings.Data?.LivestreamUrl;
+    }
+}

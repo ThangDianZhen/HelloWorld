@@ -1,0 +1,37 @@
+@page "/admin/pages"
+@layout AdminLayout
+@attribute [Authorize(Roles = Ignite.Core.Constants.Roles.Admin)]
+@rendermode InteractiveServer
+@inject Ignite.Application.Interfaces.Services.Entities.IPageService PageService
+
+<div class="admin-top"><h1>Pages</h1><a class="btn btn-gold" href="/admin/pages/new">Add page</a></div>
+<table class="table">
+    <thead><tr><th>Title</th><th>Slug</th><th></th></tr></thead>
+    <tbody>
+    @foreach (var contentPage in _items)
+    {
+        <tr>
+            <td>@contentPage.Title</td>
+            <td>/p/@contentPage.Slug</td>
+            <td>
+                <a href="@($"/admin/pages/{contentPage.Id}")">Edit</a>
+                <button class="btn btn-ghost" @onclick="() => Delete(contentPage.Id)">Delete</button>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+@code {
+    private IReadOnlyList<PageDto> _items = [];
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await PageService.GetAllAsync(publishedOnly: false);
+        if (result.IsSuccess && result.Data is not null) _items = result.Data;
+    }
+    private async Task Delete(Guid id)
+    {
+        await PageService.DeleteAsync(id);
+        var result = await PageService.GetAllAsync(publishedOnly: false);
+        if (result.IsSuccess && result.Data is not null) _items = result.Data;
+    }
+}

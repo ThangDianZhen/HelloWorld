@@ -1,0 +1,40 @@
+@page "/events/{Slug}"
+@inject Ignite.Application.Interfaces.Services.Entities.IEventService EventService
+
+<PageTitle>@(_event?.Title ?? "Event") · Ignite</PageTitle>
+<section class="section">
+    <div class="container narrow">
+        @if (_event is null)
+        {
+            <p>@_error</p>
+        }
+        else
+        {
+            <div class="kicker">@_event.StartsAtUtc.ToString("dddd d MMMM yyyy")</div>
+            <h1>@_event.Title</h1>
+            <p>@(_event.LocationName ?? _event.CampusName)</p>
+            <p>@_event.Description</p>
+            @if (!string.IsNullOrWhiteSpace(_event.RegistrationUrl))
+            {
+                <a class="btn btn-gold" href="@_event.RegistrationUrl" target="_blank" rel="noreferrer">Register</a>
+            }
+            else
+            {
+                <a class="btn btn-gold" href="/connect">I am coming</a>
+            }
+        }
+    </div>
+</section>
+
+@code {
+    [Parameter] public string Slug { get; set; } = string.Empty;
+    private ChurchEventDto? _event;
+    private string _error = "Loading...";
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var result = await EventService.GetBySlugAsync(Slug);
+        if (result.IsSuccess) _event = result.Data;
+        else { _event = null; _error = result.ErrorMessage; }
+    }
+}

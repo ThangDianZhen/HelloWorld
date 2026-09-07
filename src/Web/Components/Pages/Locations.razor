@@ -1,0 +1,35 @@
+@page "/locations"
+@inject Ignite.Application.Interfaces.Services.Entities.ICampusService CampusService
+
+<PageTitle>Locations · Ignite</PageTitle>
+<section class="section">
+    <div class="container">
+        <div class="kicker">Campuses</div>
+        <h1>Our locations</h1>
+        <p>Find a weekend service near you, or join us online.</p>
+        <div class="grid grid-3" style="margin-top:2rem">
+            @foreach (var campus in _campuses)
+            {
+                <a class="card" href="@($"/locations/{campus.Slug}")">
+                    <div class="meta">@(campus.IsOnlineCampus ? "Online campus" : campus.Country)</div>
+                    <h3>@campus.Name</h3>
+                    <p>@campus.Address</p>
+                    <p>@campus.Description</p>
+                </a>
+            }
+        </div>
+    </div>
+</section>
+
+@code {
+    private IReadOnlyList<CampusDto> _campuses = [];
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await CampusService.GetAllAsync(publishedOnly: true);
+        if (result.IsSuccess && result.Data is not null)
+        {
+            _campuses = result.Data;
+        }
+    }
+}

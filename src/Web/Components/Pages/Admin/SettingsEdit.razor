@@ -1,0 +1,49 @@
+@page "/admin/settings"
+@layout AdminLayout
+@attribute [Authorize(Roles = Ignite.Core.Constants.Roles.Admin)]
+@rendermode InteractiveServer
+@inject Ignite.Application.Interfaces.Services.Entities.IChurchSettingsService SettingsService
+
+<div class="admin-top"><h1>Church settings</h1></div>
+<EditForm Model="_form" OnValidSubmit="Save" class="form">
+    <label>Church name <InputText @bind-Value="_form.Name" /></label>
+    <label>Tagline <InputText @bind-Value="_form.Tagline" /></label>
+    <label>Hero title <InputText @bind-Value="_form.HeroTitle" /></label>
+    <label>Hero subtitle <InputTextArea @bind-Value="_form.HeroSubtitle" /></label>
+    <label>About HTML <InputTextArea @bind-Value="_form.AboutHtml" /></label>
+    <label>Livestream URL <InputText @bind-Value="_form.LivestreamUrl" /></label>
+    <label>Giving URL <InputText @bind-Value="_form.GivingUrl" /></label>
+    <label>Giving headline <InputText @bind-Value="_form.GivingHeadline" /></label>
+    <label>Giving body <InputTextArea @bind-Value="_form.GivingBody" /></label>
+    <label>Contact email <InputText @bind-Value="_form.ContactEmail" /></label>
+    <label>Footer note <InputText @bind-Value="_form.FooterNote" /></label>
+    @if (!string.IsNullOrWhiteSpace(_status)) { <p class="ok">@_status</p> }
+    @if (!string.IsNullOrWhiteSpace(_error)) { <p class="error">@_error</p> }
+    <button class="btn btn-gold" type="submit">Save settings</button>
+</EditForm>
+@code {
+    private ChurchSettingsWriteDto _form = new();
+    private string _status = string.Empty;
+    private string _error = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await SettingsService.GetAsync();
+        if (!result.IsSuccess || result.Data is null) return;
+        var s = result.Data;
+        _form = new ChurchSettingsWriteDto
+        {
+            Name = s.Name, Tagline = s.Tagline, AboutHtml = s.AboutHtml, HeroTitle = s.HeroTitle, HeroSubtitle = s.HeroSubtitle,
+            HeroVideoUrl = s.HeroVideoUrl, LivestreamUrl = s.LivestreamUrl, GivingUrl = s.GivingUrl, GivingHeadline = s.GivingHeadline,
+            GivingBody = s.GivingBody, ContactEmail = s.ContactEmail, ContactPhone = s.ContactPhone, LogoUrl = s.LogoUrl, FooterNote = s.FooterNote
+        };
+    }
+
+    private async Task Save()
+    {
+        _status = _error = string.Empty;
+        var result = await SettingsService.UpdateAsync(_form);
+        if (result.IsSuccess) _status = "Settings saved.";
+        else _error = result.HasErrors ? string.Join(" ", result.Errors) : result.ErrorHeader;
+    }
+}
