@@ -22,7 +22,7 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 builder.Services.AddCascadingAuthenticationState();
 builder.Services.AddHttpContextAccessor();
-builder.Services.AddControllers()
+builder.Services.AddControllersWithViews()
     .AddApplicationPart(typeof(SiteController).Assembly);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
